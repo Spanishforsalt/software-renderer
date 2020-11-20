@@ -61,8 +61,10 @@ void line(int x0, int y0, int x1, int y1, TGAImage &image, TGAColor colour) { //
 int main(int argc, char** argv) {
 	TGAImage image(width, height, TGAImage::RGB);
 	
-	for (int i=0; i < 1000; i++) {
-		
+	for (int i=0; i < 1000000; i++) { //draws lines a million times to test with gprof
+		line(13, 20, 80, 40, image, white);
+		line(20, 13, 40, 80, image, red); 
+		line(80, 40, 13, 20, image, red);
 	}
 	image.flip_vertically(); // puts the origin at the left bottom corner of the image
 	image.write_tga_file("output.tga");
