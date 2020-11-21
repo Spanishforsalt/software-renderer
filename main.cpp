@@ -1,9 +1,14 @@
+#include <cmath>
+#include <vector>
+#include "model.h"
+#include "geometry.h"
 #include "tgaimage.h"
 
 const TGAColor white = TGAColor(255, 255, 255, 255);
 const TGAColor red   = TGAColor(255, 0,   0,   255);
-const int width  = 100;
-const int height = 100;
+const int width  = 800;
+const int height = 800;
+Model* model = NULL;
 
 
 void line(int x0, int y0, int x1, int y1, TGAImage &image, TGAColor colour) { //Utilising Bresenhelm's line drawing algorithm
@@ -59,13 +64,29 @@ void line(int x0, int y0, int x1, int y1, TGAImage &image, TGAColor colour) { //
 }
 
 int main(int argc, char** argv) {
+	(argc == 2) ? model = new Model(argv[1]) : model = new Model("obj/african_head.obj");
+	/* if file path is specified in command line arguments then use object at path as model
+		else use default */
+
 	TGAImage image(width, height, TGAImage::RGB);
-	
-	for (int i=0; i < 1000000; i++) { //draws lines a million times to test with gprof
-		line(13, 20, 80, 40, image, white);
-		line(20, 13, 40, 80, image, red); 
-		line(80, 40, 13, 20, image, red);
+
+	for (int i = 0; i < model->num_of_faces(); i++) {
+		std::vector<int> face = model->face(i); //retrieve each face from container of faces
+
+		for (int j = 0; j < 3; j++) {
+			Vector3f v0 = model->vertex(face[j]); //note that face 1/2/3 refers to index of each vertex
+			Vector3f v1 = model->vertex(face[(j+1)%3]);
+			/* (j+1) % 3 allows a triangle to form between 1->2, 2->3, 3->1 in above example */
+			
+			int x0 = (v0.x+1) * width/2;
+			int x1 = (v1.x+1) * height/2;
+			int y0 = (v0.y+1) * width/2;
+			int y1 = (v1.y+1) * height/2;
+
+			line(x0, y0, x1, y1, image, white);
+		}
 	}
+
 	image.flip_vertically(); // puts the origin at the left bottom corner of the image
 	image.write_tga_file("output.tga");
 	return 0;
