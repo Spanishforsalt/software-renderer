@@ -89,6 +89,7 @@ int main(int argc, char** argv) {
 
 	image.flip_vertically(); // puts the origin at the left bottom corner of the image
 	image.write_tga_file("output.tga");
+	delete model;
 	return 0;
 }
 
